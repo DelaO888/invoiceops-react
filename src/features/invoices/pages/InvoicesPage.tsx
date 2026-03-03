@@ -1,9 +1,15 @@
 import { useInvoices } from "../hooks/useInvoices";
 import { formatCurrency, formatDate } from "../../../lib/utils/format";
+import { useState } from "react";
+import InvoiceForm from "../components/InvoiceForm";
+import { useCreateInvoice } from "../hooks/useCreateInvoice";
+import type { InvoiceFormValues } from "../validation";
 
 export default function InvoicesPage() {
 
 const {data, isLoading, isError, error} = useInvoices();
+ const createMutation = useCreateInvoice();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
 const invoices = data ?? [];
 
@@ -41,9 +47,12 @@ const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((
         <p className="text-sm text-zinc-300">
           Listado de Facturas
         </p>
-        <button className="rounded-xl bg-white/90 text-black px-3 py-1.5 text-sm font-medium hover:bg-white">
-          + Nueva Factura
-        </button>
+   <button
+  className="rounded-xl bg-white/90 text-black px-3 py-1.5 text-sm font-medium hover:bg-white"
+  onClick={() => setIsCreateOpen(true)}
+>
+  + Nueva factura
+</button>
       </div>
 
 {isLoading && (<div className="p-4 text-sm text-zinc-400">Cargando Facturas...</div>)}
@@ -116,6 +125,31 @@ const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((
 )}
 
      </div>
+
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 p-4 shadow-xl">
+            <h2 className="text-lg font-semibold mb-2">
+              Nueva factura
+            </h2>
+            <p className="mb-4 text-xs text-zinc-400">
+              (Mock) Los datos se guardan en memoria por ahora.
+            </p>
+            <InvoiceForm
+              mode="create"
+              onCancel={() => setIsCreateOpen(false)}
+              isSubmitting={createMutation.isPending}
+              onSubmit={async (values: InvoiceFormValues) => {
+                await createMutation.mutateAsync(values);
+                setIsCreateOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+
+
 
 
     </div>
