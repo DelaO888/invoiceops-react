@@ -4,12 +4,21 @@ import { useState } from "react";
 import InvoiceForm from "../components/InvoiceForm";
 import { useCreateInvoice } from "../hooks/useCreateInvoice";
 import type { InvoiceFormValues } from "../validation";
+import { useUpdateInvoice } from "../hooks/useUpdateInvoice";
+import { useDeleteInvoice } from "../hooks/useDeleteInvoice";
+import type { Invoice } from "../types";
 
 export default function InvoicesPage() {
 
 const {data, isLoading, isError, error} = useInvoices();
  const createMutation = useCreateInvoice();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const updateMutation = useUpdateInvoice();
+  const deleteMutation = useDeleteInvoice();
+
+  const [editing, setEditing] = useState<Invoice | null>(null);
+const [deleting, setDeleting] = useState<Invoice | null>(null);
 
 const invoices = data ?? [];
 
@@ -86,6 +95,9 @@ const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((
                   <th className="px-4 py-2 text-center font-medium text-zinc-400">
                     Estatus
                   </th>
+                  <th className="px-4 py-2 text-right font-medium text-zinc-400">
+  Acciones
+</th>
         </tr>
       </thead>
       <tbody>
@@ -108,6 +120,19 @@ const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((
                     </td>
                     <td className="px-4 py-2 text-center">
                       <StatusBadge status={inv.status} />
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => setEditing(inv)} className="rounded-lg border border-zinc-700 px-2.5 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
+                          Editar
+                        </button>
+                        <button
+                        className="rounded-lg border border-red-500/40 bg-red-500/10 px-2.5 py-1 text-xs text-red-200 hover:bg-red-500/20"
+                        onClick={() => setDeleting(inv)}
+                      >
+                        Borrar
+                        </button>
+                      </div>
                     </td>
           </tr>
         ))}
