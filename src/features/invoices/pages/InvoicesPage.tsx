@@ -20,7 +20,26 @@ const {data, isLoading, isError, error} = useInvoices();
   const [editing, setEditing] = useState<Invoice | null>(null);
 const [deleting, setDeleting] = useState<Invoice | null>(null);
 
+const [search, setSearch] = useState("");
+
+const [statusFilter, setStatusFilter] = useState<
+  "all" | "draft" | "pending" | "paid" | "cancelled"
+>("all");
+
+
 const invoices = data ?? [];
+
+const filteredInvoices = invoices.filter((inv) => {
+  const matchesSearch = inv.number.toLowerCase().includes(search.toLowerCase()) || 
+  inv.customerName.toLowerCase().includes(search.toLowerCase())
+
+
+const matchesStatus = statusFilter === "all" ? true : inv.status === statusFilter;
+
+return matchesSearch && matchesStatus
+
+
+})
 
 const totalAmount = invoices.reduce((acc, inv) => acc + inv.amount, 0);
 const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((acc, inv) => acc + inv.amount, 0);
