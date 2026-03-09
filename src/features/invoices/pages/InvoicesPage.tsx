@@ -173,8 +173,69 @@ const totalPending = invoices.filter((inv) => inv.status === "pending").reduce((
         </div>
       )}
 
+      {editing && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 p-4 shadow-xl">
+      <h2 className="text-lg font-semibold mb-2">Editar factura</h2>
+
+      <InvoiceForm
+        mode="edit"
+        defaultValues={{
+          number: editing.number,
+          customerName: editing.customerName,
+          issueDate: editing.issueDate,
+          dueDate: editing.dueDate,
+          amount: editing.amount,
+          currency: editing.currency,
+          status: editing.status,
+        }}
+        onCancel={() => setEditing(null)}
+        isSubmitting={updateMutation.isPending}
+        onSubmit={async (values) => {
+          await updateMutation.mutateAsync({ id: editing.id, values });
+          setEditing(null);
+        }}
+      />
+    </div>
+  </div>
+)}
 
 
+      {
+        deleting && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-800 p-4 shadow-xl">
+              <h2 className="text-lg font-semibold">¿Borrar Factura?</h2>
+              <p className="mt-2 text-sm text-zinc-300">
+                Se borrará <span className="font-medium">{deleting.customerName}</span> de{" "}
+                <span className="font-medium">{deleting.customerName}</span>.
+              </p>
+
+<div className="mt-4 flex justify-end gap-2">
+        <button
+          className="rounded-xl border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800"
+          onClick={() => setDeleting(null)}
+          disabled={deleteMutation.isPending}
+        >
+          Cancelar
+        </button>
+        <button
+          className="rounded-xl bg-red-500 text-white px-3 py-1.5 text-sm font-medium disabled:opacity-70"
+          disabled={deleteMutation.isPending}
+          onClick={async () => {
+            await deleteMutation.mutateAsync(deleting.id);
+            setDeleting(null);
+          }}
+        >
+          {deleteMutation.isPending ? "Borrando..." : "Sí, borrar"}
+        </button>
+      </div>
+
+
+            </div>
+          </div>
+        )
+      }
 
 
     </div>
